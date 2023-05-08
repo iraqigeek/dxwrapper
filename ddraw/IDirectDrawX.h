@@ -218,5 +218,6 @@ public:
 
 	// Begin & end scene
 	void SetVsync();
+	void PresentPrep();
 	HRESULT Present();
 };

@@ -372,6 +372,7 @@ public:
 
 	// Direct3D9 interface functions
 	void ReleaseD9Surface(bool BackupData);
+	HRESULT PresentPrep();
 	HRESULT PresentSurface(bool isSkipScene);
 	void ResetSurfaceDisplay();
 

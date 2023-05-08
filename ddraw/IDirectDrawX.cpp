@@ -609,12 +609,6 @@ HRESULT m_IDirectDrawX::CreateSurface2(LPDDSURFACEDESC2 lpDDSurfaceDesc2, LPDIRE
 			lpDDSurfaceDesc2->dwBackBufferCount = 0;
 		}
 
-		// Add flag for 3D device
-		if ((DirectXVersion < 4) && (lpDDSurfaceDesc2->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE))
-		{
-			lpDDSurfaceDesc2->ddsCaps.dwCaps |= DDSCAPS_3DDEVICE;
-		}
-
 		// Remove unused flags
 		if (!lpDDSurfaceDesc2->dwWidth || !lpDDSurfaceDesc2->dwHeight)
 		{
@@ -3383,6 +3377,24 @@ void m_IDirectDrawX::SetVsync()
 	if (!Config.ForceVsyncMode)
 	{
 		EnableWaitVsync = true;
+	}
+}
+
+void m_IDirectDrawX::PresentPrep()
+{
+	if (PrimarySurface && !PrimarySurface->IsSurface3D())
+	{
+		d3d9Device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+		d3d9Device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		d3d9Device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+
+		PrimarySurface->PresentPrep();
+
+		// Draw primitive
+		if (FAILED(d3d9Device->DrawPrimitive(D3DPT_TRIANGLEFAN, 0, 2)))
+		{
+			LOG_LIMIT(100, __FUNCTION__ << " Error: failed to draw primitive");
+		}
 	}
 }
 
